@@ -1,4 +1,4 @@
-import { DataTypes, Model, Sequelize, Optional } from "sequelize";
+import { DataTypes, Model, Optional, Sequelize } from "sequelize";
 
 export interface ArticleAttributes {
   id: number;
@@ -11,9 +11,15 @@ export interface ArticleAttributes {
   updatedAt?: Date;
 }
 
-export type ArticleCreationAttributes = Optional<ArticleAttributes, "id" | "slug" | "createdAt" | "updatedAt">;
+export type ArticleCreationAttributes = Optional<
+  ArticleAttributes,
+  "id" | "slug" | "createdAt" | "updatedAt"
+>;
 
-export class Article extends Model<ArticleAttributes, ArticleCreationAttributes> implements ArticleAttributes {
+export class Article
+  extends Model<ArticleAttributes, ArticleCreationAttributes>
+  implements ArticleAttributes
+{
   public id!: number;
   public slug!: string;
   public title!: string;
@@ -32,7 +38,7 @@ export function initArticle(sequelize: Sequelize) {
       title: { type: DataTypes.STRING, allowNull: false },
       description: { type: DataTypes.STRING, allowNull: false },
       body: { type: DataTypes.TEXT, allowNull: false },
-      authorId: { type: DataTypes.INTEGER, allowNull: false }
+      authorId: { type: DataTypes.INTEGER, allowNull: false },
     },
     { sequelize, modelName: "Article", tableName: "Articles" }
   );

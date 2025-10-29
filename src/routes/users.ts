@@ -1,8 +1,17 @@
 import { Router } from "express";
-import { register, login, getCurrent, updateUser } from "../controllers/userController";
-import { validateBody } from "../middleware/validate";
+import {
+  getCurrent,
+  login,
+  register,
+  updateUser,
+} from "../controllers/userController";
 import { requireAuth } from "../middleware/auth";
-import { loginSchema, registerSchema, updateUserSchema } from "../validation/schemas";
+import { validateBody } from "../middleware/validate";
+import {
+  loginSchema,
+  registerSchema,
+  updateUserSchema,
+} from "../validation/schemas";
 
 const router = Router();
 

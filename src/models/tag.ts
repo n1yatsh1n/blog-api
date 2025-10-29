@@ -1,4 +1,4 @@
-import { DataTypes, Model, Sequelize, Optional } from "sequelize";
+import { DataTypes, Model, Optional, Sequelize } from "sequelize";
 
 export interface TagAttributes {
   id: number;
@@ -7,9 +7,15 @@ export interface TagAttributes {
   updatedAt?: Date;
 }
 
-export type TagCreationAttributes = Optional<TagAttributes, "id" | "createdAt" | "updatedAt">;
+export type TagCreationAttributes = Optional<
+  TagAttributes,
+  "id" | "createdAt" | "updatedAt"
+>;
 
-export class Tag extends Model<TagAttributes, TagCreationAttributes> implements TagAttributes {
+export class Tag
+  extends Model<TagAttributes, TagCreationAttributes>
+  implements TagAttributes
+{
   public id!: number;
   public name!: string;
   public readonly createdAt!: Date;
@@ -20,7 +26,7 @@ export function initTag(sequelize: Sequelize) {
   Tag.init(
     {
       id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      name: { type: DataTypes.STRING, allowNull: false, unique: true }
+      name: { type: DataTypes.STRING, allowNull: false, unique: true },
     },
     { sequelize, modelName: "Tag", tableName: "Tags" }
   );

@@ -32,7 +32,7 @@ export async function addComment(req: Request, res: Response) {
       id: withAuthor!.id,
       body: withAuthor!.body,
       createdAt: withAuthor!.createdAt,
-      author: (withAuthor as any).author, // 👈 добавлено "as any", чтобы убрать TS2551
+      author: (withAuthor as any).author,
     },
   });
 }

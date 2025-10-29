@@ -1,4 +1,4 @@
-import { DataTypes, Model, Sequelize, Optional } from "sequelize";
+import { DataTypes, Model, Optional, Sequelize } from "sequelize";
 
 export interface UserAttributes {
   id: number;
@@ -11,9 +11,15 @@ export interface UserAttributes {
   updatedAt?: Date;
 }
 
-export type UserCreationAttributes = Optional<UserAttributes, "id" | "bio" | "image_url" | "createdAt" | "updatedAt">;
+export type UserCreationAttributes = Optional<
+  UserAttributes,
+  "id" | "bio" | "image_url" | "createdAt" | "updatedAt"
+>;
 
-export class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
+export class User
+  extends Model<UserAttributes, UserCreationAttributes>
+  implements UserAttributes
+{
   public id!: number;
   public email!: string;
   public username!: string;
@@ -28,11 +34,16 @@ export function initUser(sequelize: Sequelize) {
   User.init(
     {
       id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-      email: { type: DataTypes.STRING, allowNull: false, unique: true, validate: { isEmail: true } },
+      email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+        validate: { isEmail: true },
+      },
       username: { type: DataTypes.STRING, allowNull: false, unique: true },
       passwordHash: { type: DataTypes.STRING, allowNull: false },
       bio: { type: DataTypes.TEXT, allowNull: true },
-      image_url: { type: DataTypes.STRING, allowNull: true }
+      image_url: { type: DataTypes.STRING, allowNull: true },
     },
     { sequelize, modelName: "User", tableName: "Users" }
   );

@@ -1,11 +1,9 @@
-import { Sequelize, DataTypes } from "sequelize";
 import { sequelize } from "../config/database";
-import type { ModelStatic } from "sequelize";
-import { initUser, User } from "./user";
-import { initArticle, Article } from "./article";
-import { initComment, Comment } from "./comment";
+import { Article, initArticle } from "./article";
+import { ArticleTag, initArticleTag } from "./articleTag";
+import { Comment, initComment } from "./comment";
 import { initTag, Tag } from "./tag";
-import { initArticleTag, ArticleTag } from "./articleTag";
+import { initUser, User } from "./user";
 
 export function initModels() {
   initUser(sequelize);
@@ -15,17 +13,39 @@ export function initModels() {
   initArticleTag(sequelize);
 
   // Associations
-  User.hasMany(Article, { foreignKey: "authorId", as: "articles", onDelete: "CASCADE" });
+  User.hasMany(Article, {
+    foreignKey: "authorId",
+    as: "articles",
+    onDelete: "CASCADE",
+  });
   Article.belongsTo(User, { foreignKey: "authorId", as: "author" });
 
-  Article.belongsToMany(Tag, { through: ArticleTag, foreignKey: "articleId", otherKey: "tagId", as: "tags" });
-  Tag.belongsToMany(Article, { through: ArticleTag, foreignKey: "tagId", otherKey: "articleId", as: "articles" });
+  Article.belongsToMany(Tag, {
+    through: ArticleTag,
+    foreignKey: "articleId",
+    otherKey: "tagId",
+    as: "tags",
+  });
+  Tag.belongsToMany(Article, {
+    through: ArticleTag,
+    foreignKey: "tagId",
+    otherKey: "articleId",
+    as: "articles",
+  });
 
-  User.hasMany(Comment, { foreignKey: "authorId", as: "comments", onDelete: "CASCADE" });
+  User.hasMany(Comment, {
+    foreignKey: "authorId",
+    as: "comments",
+    onDelete: "CASCADE",
+  });
   Comment.belongsTo(User, { foreignKey: "authorId", as: "author" });
 
-  Article.hasMany(Comment, { foreignKey: "articleId", as: "comments", onDelete: "CASCADE" });
+  Article.hasMany(Comment, {
+    foreignKey: "articleId",
+    as: "comments",
+    onDelete: "CASCADE",
+  });
   Comment.belongsTo(Article, { foreignKey: "articleId", as: "article" });
 }
 
-export { sequelize, User, Article, Comment, Tag, ArticleTag };
+export { Article, ArticleTag, Comment, sequelize, Tag, User };

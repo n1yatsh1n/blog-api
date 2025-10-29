@@ -1,4 +1,4 @@
-import { DataTypes, Model, Sequelize, Optional } from "sequelize";
+import { DataTypes, Model, Optional, Sequelize } from "sequelize";
 
 export interface CommentAttributes {
   id: number;
@@ -9,9 +9,15 @@ export interface CommentAttributes {
   updatedAt?: Date;
 }
 
-export type CommentCreationAttributes = Optional<CommentAttributes, "id" | "createdAt" | "updatedAt">;
+export type CommentCreationAttributes = Optional<
+  CommentAttributes,
+  "id" | "createdAt" | "updatedAt"
+>;
 
-export class Comment extends Model<CommentAttributes, CommentCreationAttributes> implements CommentAttributes {
+export class Comment
+  extends Model<CommentAttributes, CommentCreationAttributes>
+  implements CommentAttributes
+{
   public id!: number;
   public body!: string;
   public articleId!: number;
@@ -26,7 +32,7 @@ export function initComment(sequelize: Sequelize) {
       id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
       body: { type: DataTypes.TEXT, allowNull: false },
       articleId: { type: DataTypes.INTEGER, allowNull: false },
-      authorId: { type: DataTypes.INTEGER, allowNull: false }
+      authorId: { type: DataTypes.INTEGER, allowNull: false },
     },
     { sequelize, modelName: "Comment", tableName: "Comments" }
   );

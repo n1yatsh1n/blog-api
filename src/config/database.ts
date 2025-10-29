@@ -1,12 +1,14 @@
-import { Sequelize } from "sequelize";
 import dotenv from "dotenv";
+import { Sequelize } from "sequelize";
 dotenv.config();
 
-const url = process.env.DATABASE_URL || "postgres://postgres:postgres@localhost:5432/blog";
+const url =
+  process.env.DATABASE_URL ||
+  "postgres://postgres:postgres@localhost:5432/blog";
 
 export const sequelize = new Sequelize(url, {
   dialect: "postgres",
-  logging: false
+  logging: false,
 });
 
 export async function testConnection() {
