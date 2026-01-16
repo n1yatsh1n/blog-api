@@ -9,10 +9,7 @@ module.exports = {
       body: { type: Sequelize.TEXT, allowNull: false },
       authorId: {
         type: Sequelize.INTEGER,
-        allowNull: false,
-        references: { model: 'Users', key: 'id' },
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE'
+        allowNull: false
       },
       createdAt: { allowNull: false, type: Sequelize.DATE, defaultValue: Sequelize.fn('NOW') },
       updatedAt: { allowNull: false, type: Sequelize.DATE, defaultValue: Sequelize.fn('NOW') }

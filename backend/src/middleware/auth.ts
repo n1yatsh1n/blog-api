@@ -33,7 +33,6 @@ export async function requireAuth(
       email: string;
       username: string;
     };
-    // Optionally ensure user exists
     req.user = {
       id: payload.id,
       email: payload.email,

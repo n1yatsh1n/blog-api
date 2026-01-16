@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { Article, Comment, User } from "../models";
+import { Article, Comment } from "../models";
 
 export async function addComment(req: Request, res: Response) {
   const { slug } = req.params;
@@ -16,23 +16,14 @@ export async function addComment(req: Request, res: Response) {
     authorId: req.user!.id,
   });
 
-  // Повторный запрос с include, чтобы получить автора
-  const withAuthor = await Comment.findByPk(comment.id, {
-    include: [
-      {
-        model: User,
-        as: "author",
-        attributes: ["username", "bio", "image_url"],
-      },
-    ],
-  });
-
   res.status(201).json({
     comment: {
-      id: withAuthor!.id,
-      body: withAuthor!.body,
-      createdAt: withAuthor!.createdAt,
-      author: (withAuthor as any).author,
+      id: comment.id,
+      body: comment.body,
+      createdAt: comment.createdAt,
+      author: req.user ? {
+        username: req.user.username,
+      } : undefined,
     },
   });
 }
@@ -47,13 +38,6 @@ export async function listComments(req: Request, res: Response) {
   const comments = await Comment.findAll({
     where: { articleId: article.id },
     order: [["createdAt", "DESC"]],
-    include: [
-      {
-        model: User,
-        as: "author",
-        attributes: ["username", "bio", "image_url"],
-      },
-    ],
   });
 
   res.json({
@@ -61,7 +45,7 @@ export async function listComments(req: Request, res: Response) {
       id: c.id,
       body: c.body,
       createdAt: c.createdAt,
-      author: c.author,
+      authorId: c.authorId,
     })),
   });
 }

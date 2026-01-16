@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import { Article, ArticleTag, Tag, User } from "../models";
+import { Article, ArticleTag, Tag } from "../models";
 import { makeSlug } from "../utils/slug";
 
-function articleToJSON(article: any) {
+function articleToJSON(article: any, authorUsername?: string) {
   const tagList = (article.tags || []).map((t: any) => t.name);
   return {
     slug: article.slug,
@@ -12,11 +12,9 @@ function articleToJSON(article: any) {
     tagList,
     createdAt: article.createdAt,
     updatedAt: article.updatedAt,
-    author: article.author
+    author: authorUsername
       ? {
-          username: article.author.username,
-          bio: article.author.bio,
-          image_url: article.author.image_url,
+          username: authorUsername,
         }
       : undefined,
   };
@@ -34,7 +32,6 @@ async function syncTags(articleId: number, tagList?: string[]) {
       return tag;
     })
   );
-  // remove old relations and set new
   await ArticleTag.destroy({ where: { articleId } });
   const rows = tags.map((t) => ({ articleId, tagId: t.id }));
   if (rows.length) await ArticleTag.bulkCreate(rows);
@@ -51,17 +48,10 @@ export async function createArticle(req: Request, res: Response) {
     authorId: req.user!.id,
   });
   await syncTags(article.id, tagList);
-  const withAuthor = await Article.findByPk(article.id, {
-    include: [
-      {
-        model: User,
-        as: "author",
-        attributes: ["username", "bio", "image_url"],
-      },
-      { model: Tag, as: "tags", through: { attributes: [] } },
-    ],
+  const withTags = await Article.findByPk(article.id, {
+    include: [{ model: Tag, as: "tags", through: { attributes: [] } }],
   });
-  res.status(201).json({ article: articleToJSON(withAuthor!) });
+  res.status(201).json({ article: articleToJSON(withTags!, req.user!.username) });
 }
 
 export async function listArticles(req: Request, res: Response) {
@@ -71,34 +61,21 @@ export async function listArticles(req: Request, res: Response) {
     order: [["createdAt", "DESC"]],
     limit,
     offset,
-    include: [
-      {
-        model: User,
-        as: "author",
-        attributes: ["username", "bio", "image_url"],
-      },
-      { model: Tag, as: "tags", through: { attributes: [] } },
-    ],
+    include: [{ model: Tag, as: "tags", through: { attributes: [] } }],
   });
-  res.json({ articles: articles.map(articleToJSON), count: articles.length });
+  res.json({ articles: articles.map(a => articleToJSON(a)), count: articles.length });
 }
 
 export async function getArticle(req: Request, res: Response) {
   const { slug } = req.params;
   const article = await Article.findOne({
     where: { slug },
-    include: [
-      {
-        model: User,
-        as: "author",
-        attributes: ["username", "bio", "image_url"],
-      },
-      { model: Tag, as: "tags", through: { attributes: [] } },
-    ],
+    include: [{ model: Tag, as: "tags", through: { attributes: [] } }],
   });
   if (!article)
     return res.status(404).json({ error: { message: "Article not found" } });
-  res.json({ article: articleToJSON(article) });
+  const authorUsername = req.user && req.user.id === article.authorId ? req.user.username : undefined;
+  res.json({ article: articleToJSON(article, authorUsername) });
 }
 
 export async function updateArticle(req: Request, res: Response) {
@@ -121,16 +98,9 @@ export async function updateArticle(req: Request, res: Response) {
   await syncTags(article.id, tagList);
 
   const withRels = await Article.findByPk(article.id, {
-    include: [
-      {
-        model: User,
-        as: "author",
-        attributes: ["username", "bio", "image_url"],
-      },
-      { model: Tag, as: "tags", through: { attributes: [] } },
-    ],
+    include: [{ model: Tag, as: "tags", through: { attributes: [] } }],
   });
-  res.json({ article: articleToJSON(withRels!) });
+  res.json({ article: articleToJSON(withRels!, req.user!.username) });
 }
 
 export async function deleteArticle(req: Request, res: Response) {

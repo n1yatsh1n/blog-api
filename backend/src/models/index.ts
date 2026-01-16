@@ -3,23 +3,14 @@ import { Article, initArticle } from "./article";
 import { ArticleTag, initArticleTag } from "./articleTag";
 import { Comment, initComment } from "./comment";
 import { initTag, Tag } from "./tag";
-import { initUser, User } from "./user";
 
 export function initModels() {
-  initUser(sequelize);
   initArticle(sequelize);
   initComment(sequelize);
   initTag(sequelize);
   initArticleTag(sequelize);
 
-  // Associations
-  User.hasMany(Article, {
-    foreignKey: "authorId",
-    as: "articles",
-    onDelete: "CASCADE",
-  });
-  Article.belongsTo(User, { foreignKey: "authorId", as: "author" });
-
+  // Associations (removed User associations - user_id is now just a number without FK)
   Article.belongsToMany(Tag, {
     through: ArticleTag,
     foreignKey: "articleId",
@@ -33,13 +24,6 @@ export function initModels() {
     as: "articles",
   });
 
-  User.hasMany(Comment, {
-    foreignKey: "authorId",
-    as: "comments",
-    onDelete: "CASCADE",
-  });
-  Comment.belongsTo(User, { foreignKey: "authorId", as: "author" });
-
   Article.hasMany(Comment, {
     foreignKey: "articleId",
     as: "comments",
@@ -48,4 +32,4 @@ export function initModels() {
   Comment.belongsTo(Article, { foreignKey: "articleId", as: "article" });
 }
 
-export { Article, ArticleTag, Comment, sequelize, Tag, User };
+export { Article, ArticleTag, Comment, sequelize, Tag };

@@ -13,6 +13,7 @@ RUN npm run build
 # ---- Runtime ----
 FROM node:20-alpine
 WORKDIR /app
+RUN apk add --no-cache wget
 ENV NODE_ENV=production
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/node_modules ./node_modules
